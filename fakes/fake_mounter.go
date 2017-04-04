@@ -17,6 +17,9 @@ type FakeMounter struct {
 	mountReturns struct {
 		result1 error
 	}
+	mountReturnsOnCall map[int]struct {
+		result1 error
+	}
 	UnmountStub        func(volumeConfig map[string]interface{}) error
 	unmountMutex       sync.RWMutex
 	unmountArgsForCall []struct {
@@ -25,12 +28,16 @@ type FakeMounter struct {
 	unmountReturns struct {
 		result1 error
 	}
+	unmountReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeMounter) Mount(mountpoint string, volumeConfig map[string]interface{}) error {
 	fake.mountMutex.Lock()
+	ret, specificReturn := fake.mountReturnsOnCall[len(fake.mountArgsForCall)]
 	fake.mountArgsForCall = append(fake.mountArgsForCall, struct {
 		mountpoint   string
 		volumeConfig map[string]interface{}
@@ -39,6 +46,9 @@ func (fake *FakeMounter) Mount(mountpoint string, volumeConfig map[string]interf
 	fake.mountMutex.Unlock()
 	if fake.MountStub != nil {
 		return fake.MountStub(mountpoint, volumeConfig)
+	}
+	if specificReturn {
+		return ret.result1
 	}
 	return fake.mountReturns.result1
 }
@@ -62,8 +72,21 @@ func (fake *FakeMounter) MountReturns(result1 error) {
 	}{result1}
 }
 
+func (fake *FakeMounter) MountReturnsOnCall(i int, result1 error) {
+	fake.MountStub = nil
+	if fake.mountReturnsOnCall == nil {
+		fake.mountReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.mountReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeMounter) Unmount(volumeConfig map[string]interface{}) error {
 	fake.unmountMutex.Lock()
+	ret, specificReturn := fake.unmountReturnsOnCall[len(fake.unmountArgsForCall)]
 	fake.unmountArgsForCall = append(fake.unmountArgsForCall, struct {
 		volumeConfig map[string]interface{}
 	}{volumeConfig})
@@ -71,6 +94,9 @@ func (fake *FakeMounter) Unmount(volumeConfig map[string]interface{}) error {
 	fake.unmountMutex.Unlock()
 	if fake.UnmountStub != nil {
 		return fake.UnmountStub(volumeConfig)
+	}
+	if specificReturn {
+		return ret.result1
 	}
 	return fake.unmountReturns.result1
 }
@@ -90,6 +116,18 @@ func (fake *FakeMounter) UnmountArgsForCall(i int) map[string]interface{} {
 func (fake *FakeMounter) UnmountReturns(result1 error) {
 	fake.UnmountStub = nil
 	fake.unmountReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeMounter) UnmountReturnsOnCall(i int, result1 error) {
+	fake.UnmountStub = nil
+	if fake.unmountReturnsOnCall == nil {
+		fake.unmountReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.unmountReturnsOnCall[i] = struct {
 		result1 error
 	}{result1}
 }
